@@ -1,0 +1,16 @@
+version = "Two"
+condense_wildcard_suffixes = true
+edition = "2021"
+group_imports = "StdExternalCrate"
+imports_granularity = "Crate"
+imports_layout = "HorizontalVertical"
+max_width = 80
+newline_style = "Unix"
+normalize_comments = true
+normalize_doc_attributes = true
+reorder_impl_items = true
+reorder_imports = true
+reorder_modules = true
+use_small_heuristics = "Max"
+use_try_shorthand = true
+wrap_comments = true

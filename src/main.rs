@@ -1,3 +1,8 @@
+mod cli;
+mod commands;
+mod prelude;
+mod traits;
+
 fn main() {
-    println!("Hello, world!");
+    self::cli::Cli::exec();
 }
