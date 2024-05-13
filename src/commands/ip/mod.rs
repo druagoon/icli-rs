@@ -8,5 +8,5 @@ mod ps1;
 /// Ip utilities.
 #[derive(clap::Subcommand, icli_derive::CliCommand, Debug)]
 pub enum IpCmd {
-    PS1(ps1::IpPs1Cmd),
+    Ps1(ps1::IpPs1Cmd),
 }

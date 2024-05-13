@@ -24,7 +24,10 @@ pub struct GlobalOpts {
 
 impl Cli {
     pub fn exec() {
-        let _ = Self::exec_inner();
+        if let Err(e) = Self::exec_inner() {
+            println!("{:?}", e);
+            ::std::process::exit(1);
+        }
     }
 
     fn exec_inner() -> CliCommandResult {

@@ -5,10 +5,12 @@ use crate::prelude::*;
 
 mod completion;
 mod ip;
+mod new;
 
 #[derive(clap::Subcommand, icli_derive::CliCommand, Debug)]
 pub enum Command {
-    Completion(completion::CompletionCmd),
     #[command(subcommand)]
-    IP(ip::IpCmd),
+    Ip(ip::IpCmd),
+    Completion(completion::CompletionCmd),
+    New(new::NewCmd),
 }

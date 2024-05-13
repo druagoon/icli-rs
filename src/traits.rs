@@ -1,6 +1,6 @@
-use anyhow::Result;
+use anyhow;
 
-pub type CliCommandResult = Result<()>;
+pub type CliCommandResult = anyhow::Result<()>;
 
 pub trait CliCommand {
     fn run(&self) -> CliCommandResult;
