@@ -1,0 +1,344 @@
+proxy-providers:
+{%- for provider in clash.proxy.providers %}
+  {{ provider.name }}:
+    type: http
+    url: "{{ provider.url }}"
+    interval: {{ provider.interval }}
+    path: ./custom/providers/proxies/{{ provider.name }}.yaml
+    health-check:
+      enable: true
+      interval: 300
+      url: http://www.gstatic.com/generate_204
+{%- endfor %}
+
+proxy-providers-ref: &proxy-providers-ref
+{%- for provider in clash.proxy.providers %}
+  - {{ provider.name }}
+{%- endfor %}
+
+proxy-groups:
+  - name: Proxy
+    type: select
+    proxies:
+      - Auto
+    use:
+      *proxy-providers-ref
+
+  - name: Auto
+    type: url-test
+    url: http://www.google.com/generate_204
+    interval: 300
+    tolerance: 50
+    use:
+      *proxy-providers-ref
+
+  - name: AppleProxy
+    type: select
+    proxies:
+      - Proxy
+      - DIRECT
+    use:
+      *proxy-providers-ref
+
+  - name: Apple
+    type: select
+    proxies:
+      - DIRECT
+      - Proxy
+    use:
+      *proxy-providers-ref
+
+  - name: OpenAI
+    type: select
+    proxies:
+      - Proxy
+      - DIRECT
+    use:
+      *proxy-providers-ref
+
+  - name: PayPal
+    type: select
+    proxies:
+      - Proxy
+      - DIRECT
+    use:
+      *proxy-providers-ref
+
+  - name: Telegram
+    type: select
+    proxies:
+      - Proxy
+      - DIRECT
+    use:
+      *proxy-providers-ref
+
+  - name: Jetbrains
+    type: select
+    proxies:
+      - Proxy
+      - DIRECT
+    use:
+      *proxy-providers-ref
+
+  # - name: Reddit
+  #   type: select
+  #   proxies:
+  #     - Proxy
+  #     - DIRECT
+  #   use:
+  #     *proxy-providers-ref
+
+  - name: OneDrive
+    type: select
+    proxies:
+      - Proxy
+      - DIRECT
+    use:
+      *proxy-providers-ref
+
+  - name: Microsoft
+    type: select
+    proxies:
+      - Proxy
+      - DIRECT
+    use:
+      *proxy-providers-ref
+
+  - name: Porn
+    type: select
+    proxies:
+      - Proxy
+      - DIRECT
+    use:
+      *proxy-providers-ref
+
+  - name: Hijacking
+    type: select
+    proxies:
+      - REJECT
+      - DIRECT
+    use:
+      *proxy-providers-ref
+
+  - name: Privacy
+    type: select
+    proxies:
+      - REJECT
+      - DIRECT
+    use:
+      *proxy-providers-ref
+
+  - name: Advertising
+    type: select
+    proxies:
+      - REJECT
+      - DIRECT
+    use:
+      *proxy-providers-ref
+
+  - name: China
+    type: select
+    proxies:
+      - DIRECT
+      - Proxy
+    use:
+      *proxy-providers-ref
+
+  - name: Final
+    type: select
+    proxies:
+      - Proxy
+      - DIRECT
+    use:
+      *proxy-providers-ref
+
+rule-providers:
+  AppleProxy:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/Apple/AppleProxy.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AppleProxy/AppleProxy.yaml
+    interval: 172800
+
+  Apple:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/Apple/Apple.yaml
+    url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/Apple.yaml
+    interval: 172800
+
+  OpenAI:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/OpenAI/OpenAI.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OpenAI/OpenAI.yaml
+    interval: 172800
+
+  OpenAIX:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/x/OpenAI/OpenAI.yaml
+    url: https://raw.githubusercontent.com/druagoon/h451/master/Clash/providers/rules/x/OpenAI/OpenAI.yaml
+    interval: 172800
+
+  PayPal:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/PayPal/PayPal.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/PayPal/PayPal.yaml
+    interval: 172800
+
+  Telegram:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/Telegram/Telegram.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Telegram/Telegram.yaml
+    interval: 172800
+
+  # Reddit:
+  #   type: http
+  #   behavior: classical
+  #   path: ./custom/providers/rules/r/Reddit/Reddit.yaml
+  #   # url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Reddit/Reddit.yaml
+  #   # interval: 172800
+
+  Jetbrains:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/Jetbrains/Jetbrains.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Jetbrains/Jetbrains.yaml
+    interval: 172800
+
+  JetbrainsX:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/x/Jetbrains/Jetbrains.yaml
+    url: https://raw.githubusercontent.com/druagoon/h451/master/Clash/providers/rules/x/Jetbrains/Jetbrains.yaml
+    interval: 172800
+
+  Porn:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/Porn/Porn.yaml
+    url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/Porn.yaml
+    interval: 172800
+
+  PornAsia:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/Porn/PornAsia.yaml
+    url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/PornAsia.yaml
+    interval: 172800
+
+  PornX:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/x/Porn/Porn.yaml
+    url: https://raw.githubusercontent.com/druagoon/h451/master/Clash/providers/rules/x/Porn/Porn.yaml
+    interval: 172800
+
+  OneDrive:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/OneDrive/OneDrive.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OneDrive/OneDrive.yaml
+    interval: 172800
+
+  Microsoft:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/Microsoft/Microsoft.yaml
+    url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/Microsoft.yaml
+    interval: 172800
+
+  China_Domain:
+    type: http
+    behavior: domain
+    path: ./custom/providers/rules/r/China/China_Domain.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/China/China_Domain.yaml
+    interval: 172800
+
+  China:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/China/China.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/China/China.yaml
+    interval: 172800
+
+  ChinaX:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/x/China/China.yaml
+    url: https://raw.githubusercontent.com/druagoon/h451/master/Clash/providers/rules/x/China/China.yaml
+    interval: 172800
+
+  LocalAreaNetwork:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/Local/LocalAreaNetwork.yaml
+    url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/LocalAreaNetwork.yaml
+    interval: 172800
+
+  Hijacking:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/Hijacking/Hijacking.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Hijacking/Hijacking.yaml
+    interval: 172800
+
+  Privacy_Domain:
+    type: http
+    behavior: domain
+    path: ./custom/providers/rules/r/Privacy/Privacy_Domain.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Privacy/Privacy_Domain.yaml
+    interval: 172800
+
+  Privacy:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/Privacy/Privacy.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Privacy/Privacy.yaml
+    interval: 172800
+
+  Advertising_Domain:
+    type: http
+    behavior: domain
+    path: ./custom/providers/rules/r/Advertising/Advertising_Domain.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Advertising/Advertising_Domain.yaml
+    interval: 172800
+
+  Advertising:
+    type: http
+    behavior: classical
+    path: ./custom/providers/rules/r/Advertising/Advertising.yaml
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Advertising/Advertising.yaml
+    interval: 172800
+
+rules:
+  - RULE-SET,Hijacking,Hijacking
+  - RULE-SET,Privacy_Domain,Privacy
+  - RULE-SET,Privacy,Privacy
+  - RULE-SET,Advertising_Domain,Advertising
+  - RULE-SET,Advertising,Advertising
+  - RULE-SET,LocalAreaNetwork,DIRECT
+  - RULE-SET,AppleProxy,AppleProxy
+  - RULE-SET,Apple,Apple
+  - RULE-SET,OpenAIX,OpenAI
+  - RULE-SET,OpenAI,OpenAI
+  - RULE-SET,PayPal,PayPal
+  - RULE-SET,Telegram,Telegram
+  # - RULE-SET,Reddit,Reddit
+  - RULE-SET,JetbrainsX,Jetbrains
+  - RULE-SET,Jetbrains,Jetbrains
+  - RULE-SET,PornX,Porn
+  - RULE-SET,PornAsia,Porn
+  - RULE-SET,Porn,Porn
+  - RULE-SET,OneDrive,OneDrive
+  - RULE-SET,Microsoft,Microsoft
+  - RULE-SET,ChinaX,China
+  - RULE-SET,China_Domain,China
+  - RULE-SET,China,China
+  # GeoIP CN
+  - GEOIP,CN,China
+  # Final
+  - MATCH,Final

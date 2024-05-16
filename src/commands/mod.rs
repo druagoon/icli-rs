@@ -2,6 +2,7 @@ mod completion;
 mod ip;
 mod makefile;
 mod new;
+mod vpn;
 
 use crate::prelude::*;
 
@@ -11,6 +12,9 @@ pub enum Command {
     Ip(ip::IpCmd),
     #[command(subcommand)]
     Makefile(makefile::MakefileCmd),
+    #[cfg(feature = "vpn")]
+    #[command(subcommand)]
+    Vpn(vpn::VpnCmd),
     Completion(completion::CompletionCmd),
     New(new::NewCmd),
 }

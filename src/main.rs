@@ -1,6 +1,8 @@
 mod cli;
 mod commands;
+mod config;
 mod consts;
+mod de;
 mod macros;
 mod prelude;
 mod traits;
