@@ -1,9 +1,6 @@
-use clap;
-use icli_derive;
+mod {{ name }};
 
 use crate::prelude::*;
-
-mod {{ name }};
 
 #[derive(clap::Subcommand, icli_derive::CliCommand, Debug)]
 pub enum {{ group }}Cmd {    {%- if has_c_attrs %}

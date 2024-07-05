@@ -1,9 +1,6 @@
-use clap;
-use icli_derive;
+mod ps1;
 
 use crate::prelude::*;
-
-mod ps1;
 
 /// Ip utilities.
 #[derive(clap::Subcommand, icli_derive::CliCommand, Debug)]

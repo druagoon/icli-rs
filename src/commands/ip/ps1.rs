@@ -1,4 +1,3 @@
-use clap;
 use pnet::datalink::interfaces;
 
 use crate::prelude::*;

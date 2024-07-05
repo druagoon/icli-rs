@@ -2,7 +2,8 @@ use std::path::PathBuf;
 
 use clap::{CommandFactory, Parser};
 
-use crate::{commands::Command, prelude::*};
+use crate::commands::Command;
+use crate::prelude::*;
 
 #[derive(clap::Parser, Debug)]
 #[command(version, about, long_about = None)]

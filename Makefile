@@ -1,27 +1,51 @@
+.DEFAULT_GOAL := help
+
 SHELL := bash
 
+##@ Build
+
 .PHONY: clean
-clean:
+clean: ## Clean project
+	cargo clean
+
+.PHONY: purge
+purge: clean ## Purge project (clean and then remove the target folder if exists)
 	@if [[ -d ./target ]]; then \
 		rm -rf ./target; \
 	fi
 
+##@ Lint & Format
+
 .PHONY: check
-check:
-	@cargo +nightly fmt --check
+check: ## Cargo check all the targets
+	cargo check --workspace --all-targets --all-features
+
+.PHONY: clippy
+clippy: ## Check clippy rules
+	cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+.PHONY: clippy-fix
+clippy-fix: ## Fix clippy violations
+	cargo clippy --workspace --all-targets --all-features --fix
 
 .PHONY: fmt
-fmt:
-	@cargo +nightly fmt
+fmt: ## Format all the Rust code
+	cargo +nightly fmt --all
 
-.PHONY: build
-build: fmt
-	@cargo build
+.PHONY: fmt-check
+fmt-check: ## Check code format
+	cargo +nightly fmt --all -- --check
 
-.PHONY: release
-release: fmt
-	@cargo build --release
+.PHONY: fmt-toml
+fmt-toml: ## Format all TOML files
+	taplo format
 
-.PHONY: run
-run: fmt
-	@cargo run
+.PHONY: check-toml
+check-toml: ## Check all TOML files
+	taplo format --check
+
+##@ General
+
+.PHONY: help
+help: ## Display help messages
+	@./.make/help "$(MAKEFILE_LIST)"

@@ -2,9 +2,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Data, DataEnum, DeriveInput, Ident};
 
-pub fn derive_cli_command(
-    input: &DeriveInput,
-) -> Result<TokenStream, syn::Error> {
+pub fn derive_cli_command(input: &DeriveInput) -> Result<TokenStream, syn::Error> {
     let ident = &input.ident;
 
     match input.data {

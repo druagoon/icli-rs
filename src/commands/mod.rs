@@ -1,11 +1,8 @@
-use clap;
-use icli_derive;
-
-use crate::prelude::*;
-
 mod completion;
 mod ip;
 mod new;
+
+use crate::prelude::*;
 
 #[derive(clap::Subcommand, icli_derive::CliCommand, Debug)]
 pub enum Command {

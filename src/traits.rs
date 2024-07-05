@@ -1,5 +1,3 @@
-use anyhow;
-
 pub type CliCommandResult = anyhow::Result<()>;
 
 pub trait CliCommand {

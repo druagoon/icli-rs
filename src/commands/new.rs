@@ -1,15 +1,12 @@
-use std::{
-    fs,
-    ops::Deref,
-    path::{Path, PathBuf},
-    str::FromStr,
-};
+use std::fs;
+use std::ops::Deref;
+use std::path::{Path, PathBuf};
+use std::str::FromStr;
 
-use clap;
-use heck;
 use tera::{Context, Tera};
 
-use crate::{consts, prelude::*};
+use crate::consts;
+use crate::prelude::*;
 
 const TEMPLATE_CLI_CMD: &str = include_str!("../../templates/cli/cmd.rs");
 const TEMPLATE_CLI_MOD: &str = include_str!("../../templates/cli/mod.rs");
@@ -36,15 +33,12 @@ impl CliCommand for NewCmd {
 
 fn init_engine() -> tera::Result<Tera> {
     let mut engine = Tera::default();
-    engine.add_raw_templates(vec![
-        ("cmd.rs", TEMPLATE_CLI_CMD),
-        ("mod.rs", TEMPLATE_CLI_MOD),
-    ])?;
+    engine.add_raw_templates(vec![("cmd.rs", TEMPLATE_CLI_CMD), ("mod.rs", TEMPLATE_CLI_MOD)])?;
     Ok(engine)
 }
 
 fn make_path<T: AsRef<Path>>(p: &T) -> PathBuf {
-    let it = p.as_ref().iter().map(|v| v.to_str().unwrap().replace("-", ""));
+    let it = p.as_ref().iter().map(|v| v.to_str().unwrap().replace('-', ""));
     PathBuf::from_iter(it)
 }
 
@@ -58,7 +52,7 @@ fn create_cmd(engine: &Tera, pb: &PathBuf) -> anyhow::Result<()> {
     if !filepath.is_file() {
         let file_dir = filepath.parent().unwrap();
         if !file_dir.is_dir() {
-            fs::create_dir_all(&file_dir)?;
+            fs::create_dir_all(file_dir)?;
         }
     }
 
@@ -91,7 +85,7 @@ fn create_mod(engine: &Tera, pb: &mut PathBuf) -> anyhow::Result<()> {
             let name_v = heck::AsPascalCase(name_p).to_string();
             let name_c = make_name(pb);
 
-            let has_dash = name_p.contains("-");
+            let has_dash = name_p.contains('-');
             let mut attrs = vec![];
             if is_subcommand {
                 attrs.push("subcommand");
