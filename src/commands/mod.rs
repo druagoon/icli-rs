@@ -1,5 +1,6 @@
 mod completion;
 mod ip;
+mod makefile;
 mod new;
 
 use crate::prelude::*;
@@ -8,6 +9,8 @@ use crate::prelude::*;
 pub enum Command {
     #[command(subcommand)]
     Ip(ip::IpCmd),
+    #[command(subcommand)]
+    Makefile(makefile::MakefileCmd),
     Completion(completion::CompletionCmd),
     New(new::NewCmd),
 }
