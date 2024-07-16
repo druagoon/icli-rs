@@ -1,6 +1,15 @@
 # VSCode settings
 .vscode/
 
+# JetBrains IDE config directory
+.idea/
+
+# Environments
+*.env
+.venv/
+venv/
+venv.bak/
+
 # will have compiled files and executables
 debug/
 target/
