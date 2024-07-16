@@ -8,8 +8,12 @@ use tera::{Context, Tera};
 use crate::consts;
 use crate::prelude::*;
 
-const TEMPLATE_CLI_CMD: &str = include_str!("../../templates/cli/cmd.rs");
-const TEMPLATE_CLI_MOD: &str = include_str!("../../templates/cli/mod.rs");
+const CLI_CMD_TEMPLATE_NAME: &str = "cmd.rs";
+const CLI_MOD_TEMPLATE_NAME: &str = "mod.rs";
+const CLI_TEMPLATES: [(&str, &str); 2] = [
+    (CLI_CMD_TEMPLATE_NAME, include_template!("cli/cmd.rs")),
+    (CLI_MOD_TEMPLATE_NAME, include_template!("cli/mod.rs")),
+];
 
 /// Crate a new command and generate the layout files.
 #[derive(clap::Parser, Debug)]
@@ -33,7 +37,7 @@ impl CliCommand for NewCmd {
 
 fn init_engine() -> tera::Result<Tera> {
     let mut engine = Tera::default();
-    engine.add_raw_templates(vec![("cmd.rs", TEMPLATE_CLI_CMD), ("mod.rs", TEMPLATE_CLI_MOD)])?;
+    engine.add_raw_templates(CLI_TEMPLATES)?;
     Ok(engine)
 }
 
@@ -61,7 +65,7 @@ fn create_cmd(engine: &Tera, pb: &PathBuf) -> anyhow::Result<()> {
     ctx.insert("name_c", &name_c);
 
     let fp = fs::File::create(&filepath)?;
-    engine.render_to("cmd.rs", &ctx, fp)?;
+    engine.render_to(CLI_CMD_TEMPLATE_NAME, &ctx, fp)?;
 
     Ok(())
 }
@@ -75,7 +79,7 @@ fn create_mod(engine: &Tera, pb: &mut PathBuf) -> anyhow::Result<()> {
         if !parent.is_dir() {
             fs::create_dir_all(parent)?;
         }
-        let mod_rs = parent.join("mod.rs");
+        let mod_rs = parent.join(CLI_MOD_TEMPLATE_NAME);
         if !mod_rs.is_file() {
             let fp = fs::File::create(&mod_rs)?;
 
@@ -104,7 +108,7 @@ fn create_mod(engine: &Tera, pb: &mut PathBuf) -> anyhow::Result<()> {
             ctx.insert("name_c", &name_c);
             ctx.insert("has_c_attrs", &has_c_attrs);
             ctx.insert("c_attrs", &c_attrs);
-            engine.render_to("mod.rs", &ctx, fp)?;
+            engine.render_to(CLI_MOD_TEMPLATE_NAME, &ctx, fp)?;
         }
         pb.pop();
         is_subcommand = true;
