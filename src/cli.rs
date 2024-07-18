@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use clap::{CommandFactory, Parser};
 
 use crate::commands::Command;
@@ -9,31 +7,19 @@ use crate::prelude::*;
 #[command(version, about, long_about = None)]
 #[command(bin_name = clap::crate_name!())]
 pub struct Cli {
-    #[command(flatten)]
-    global_opts: GlobalOpts,
-
     #[command(subcommand)]
     command: Option<Command>,
-}
-
-#[derive(clap::Args, Debug)]
-pub struct GlobalOpts {
-    /// Set a custom config file
-    #[arg(short = 'c', long, global = true, value_name = "FILE")]
-    config: Option<PathBuf>,
+    #[command(flatten)]
+    verbose: clap_verbosity_flag::Verbosity,
 }
 
 impl Cli {
     pub fn exec() {
-        if let Err(e) = Self::exec_inner() {
-            println!("{:?}", e);
+        let cli = Self::parse();
+        if let Err(e) = cli.run() {
+            eprintln!("{:?}", e);
             ::std::process::exit(1);
         }
-    }
-
-    fn exec_inner() -> CliCommandResult {
-        let cmd = Self::parse();
-        cmd.run()
     }
 
     /// See also [`clap::Command::build`]
@@ -44,10 +30,22 @@ impl Cli {
         cmd.build();
         cmd
     }
+
+    fn init(&self) {
+        self.init_logging()
+    }
+
+    /// Initialize logging system.
+    fn init_logging(&self) {
+        let level = self.verbose.log_level_filter();
+        env_logger::Builder::new().filter_level(level).init();
+        log::debug!("initialize logging system at log level: {}", level);
+    }
 }
 
 impl CliCommand for Cli {
     fn run(&self) -> CliCommandResult {
+        self.init();
         match &self.command {
             Some(cmd) => cmd.run(),
             None => {
