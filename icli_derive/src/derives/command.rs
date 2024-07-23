@@ -13,7 +13,7 @@ pub fn derive_cli_command(input: &DeriveInput) -> Result<TokenStream, syn::Error
         _ => {
             let err = syn::Error::new(
                 proc_macro2::Span::call_site(),
-                "`#[derive(CliSubcommand)]` only supports enums",
+                "`#[derive(icli_derive::CliCommand)]` only supports enums",
             );
             Err(err)
         }
@@ -32,7 +32,7 @@ fn impl_cli_command(ident: &Ident, de: &DataEnum) -> TokenStream {
 fn gen_run(ident: &Ident, de: &DataEnum) -> TokenStream {
     let subcommands = de.variants.iter().map(|variant| &variant.ident);
     quote! {
-        fn run(&self) -> CliCommandResult {
+        fn run(&self) -> CliResult {
             match self {
                 #(#ident::#subcommands(cmd) => cmd.run()),*
             }

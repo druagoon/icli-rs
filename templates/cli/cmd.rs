@@ -4,7 +4,7 @@ use crate::prelude::*;
 pub struct {{ name_c }}Cmd {}
 
 impl CliCommand for {{ name_c }}Cmd {
-    fn run(&self) -> CliCommandResult {
+    fn run(&self) -> CliResult {
         Ok(())
     }
 }

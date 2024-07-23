@@ -58,7 +58,7 @@ impl VpnMakeConfigCmd {
 }
 
 impl CliCommand for VpnMakeConfigCmd {
-    fn run(&self) -> CliCommandResult {
+    fn run(&self) -> CliResult {
         match self.app {
             #[cfg(all(target_os = "macos", feature = "clashx"))]
             VpnApp::ClashX => ClashXConfig::new(self).make(),

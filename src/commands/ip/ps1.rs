@@ -7,7 +7,7 @@ use crate::prelude::*;
 pub struct IpPs1Cmd {}
 
 impl CliCommand for IpPs1Cmd {
-    fn run(&self) -> CliCommandResult {
+    fn run(&self) -> CliResult {
         let mut outputs = vec![];
         let ifaces = interfaces();
         for v in &ifaces {

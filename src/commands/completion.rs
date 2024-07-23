@@ -12,10 +12,8 @@ pub struct CompletionCmd {
 }
 
 impl CliCommand for CompletionCmd {
-    fn run(&self) -> CliCommandResult {
-        use crate::cli::Cli;
-
-        let cmd = Cli::build();
+    fn run(&self) -> CliResult {
+        let cmd = crate::cli::Cli::build();
         self.shell.generate(&cmd, &mut io::stdout());
         Ok(())
     }

@@ -1,7 +1,11 @@
 use clap::{CommandFactory, Parser};
 
 use crate::commands::Command;
-use crate::prelude::*;
+use crate::error::CliResult;
+
+pub trait CliCommand {
+    fn run(&self) -> CliResult;
+}
 
 #[derive(clap::Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -44,7 +48,7 @@ impl Cli {
 }
 
 impl CliCommand for Cli {
-    fn run(&self) -> CliCommandResult {
+    fn run(&self) -> CliResult {
         self.init();
         match &self.command {
             Some(cmd) => cmd.run(),

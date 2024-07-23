@@ -23,7 +23,7 @@ pub struct NewCmd {
 }
 
 impl CliCommand for NewCmd {
-    fn run(&self) -> CliCommandResult {
+    fn run(&self) -> CliResult {
         let engine = &init_engine()?;
         let mut pb = PathBuf::from_str(&self.path)?;
 

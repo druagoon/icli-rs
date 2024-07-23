@@ -23,7 +23,7 @@ const MAKEFILE_TEMPLATES: [(&str, &str); 1] =
     [(MAKEFILE_HELP_TEMPLATE_NAME, include_template!("makefile/help"))];
 
 impl CliCommand for MakefileAddHelpCmd {
-    fn run(&self) -> CliCommandResult {
+    fn run(&self) -> CliResult {
         let engine = &init_engine()?;
         generate(engine, &self.shell_dir, &self.description)?;
         Ok(())
