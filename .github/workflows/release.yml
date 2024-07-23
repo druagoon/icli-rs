@@ -1,0 +1,63 @@
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  create-release:
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/create-gh-release-action@v1
+        with:
+          changelog: "CHANGELOG.md"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  upload-assets:
+    name: "Upload release binaries"
+    needs: create-release
+    if: success()
+    strategy:
+      matrix:
+        include:
+          # Windows
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          # macOS
+          # - os: macos-latest
+          #   target: aarch64-apple-darwin
+          # - os: macos-latest
+          #   target: x86_64-apple-darwin
+          # Linux
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      # - name: Install dependencies (ubuntu only)
+      #   if: matrix.os == 'ubuntu-latest'
+      #   run: sudo apt-get update && sudo apt-get install -y libpcap-dev
+      - name: Install dependencies `Npcap` since it's necessary for `pnet` crate (windows only)
+        # https://github.com/libpnet/libpnet?tab=readme-ov-file#windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          Invoke-WebRequest -Uri "https://npcap.com/dist/npcap-sdk-1.13.zip" -OutFile "C:/npcap-sdk.zip"
+          Expand-Archive -LiteralPath C:/npcap-sdk.zip -DestinationPath C:/npcap-sdk
+          echo "LIB=C:/npcap-sdk/Lib/x64" >> $env:GITHUB_ENV
+      - uses: taiki-e/upload-rust-binary-action@v1
+        with:
+          bin: icli
+          checksum: sha256
+          target: ${{ matrix.target }}
+          archive: $bin-$tag-$target
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
