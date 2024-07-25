@@ -53,10 +53,10 @@ trait VpnClashConfigGenerator: VpnConfigGenerator {
 
     fn get_app_name() -> &'static ClashAppName;
 
-    fn get_app_cfg_dir() -> anyhow::Result<PathBuf> {
+    fn get_app_config_dir() -> anyhow::Result<PathBuf> {
         let app_name = Self::get_app_name();
         CONFIG
-            .get_clash_app_cfg_dir(app_name)
+            .get_clash_app_config_dir(app_name)
             .to_owned()
             .ok_or(anyhow::format_err!("clash app config directory is not set"))
     }
@@ -137,7 +137,7 @@ trait VpnClashConfigGenerator: VpnConfigGenerator {
     }
 
     fn make_rules(rule_providers_kv: HashMap<String, ClashRuleProviderItem>) -> anyhow::Result<()> {
-        let cfg_dir = Self::get_app_cfg_dir()?;
+        let cfg_dir = Self::get_app_config_dir()?;
         let client = Self::get_request_client()?;
         log::info!("starting download rules ...");
         for item in rule_providers_kv

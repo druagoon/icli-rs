@@ -45,7 +45,7 @@ pub struct ClashApp {
 #[derive(serde::Deserialize, serde::Serialize, Debug)]
 pub struct ClashAppClashX {
     #[serde(default, deserialize_with = "deserialize_path")]
-    pub base_dir: Option<PathBuf>,
+    pub config_dir: Option<PathBuf>,
 }
 
 #[cfg(feature = "clash_verge")]
@@ -53,7 +53,7 @@ pub struct ClashAppClashX {
 #[derive(serde::Deserialize, serde::Serialize, Debug)]
 pub struct ClashAppClashVerge {
     #[serde(default, deserialize_with = "deserialize_path")]
-    pub base_dir: Option<PathBuf>,
+    pub config_dir: Option<PathBuf>,
 }
 
 #[allow(dead_code)]
@@ -98,12 +98,12 @@ impl super::Config {
     }
 
     #[allow(dead_code)]
-    pub fn get_clash_app_cfg_dir(&self, name: &ClashAppName) -> &Option<PathBuf> {
+    pub fn get_clash_app_config_dir(&self, name: &ClashAppName) -> &Option<PathBuf> {
         match name {
             #[cfg(all(target_os = "macos", feature = "clashx"))]
-            ClashAppName::ClashX => &self.clash.app.clashx.base_dir,
+            ClashAppName::ClashX => &self.clash.app.clashx.config_dir,
             #[cfg(feature = "clash_verge")]
-            ClashAppName::ClashVerge => &self.clash.app.clash_verge.base_dir,
+            ClashAppName::ClashVerge => &self.clash.app.clash_verge.config_dir,
             #[allow(unreachable_patterns)]
             _ => &None,
         }

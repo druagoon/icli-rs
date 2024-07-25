@@ -1,25 +1,25 @@
 [proxy]
-# http = ""
-# https = ""
-# all = ""
+# all = "http://127.0.0.1:7890"
+# http = "http://127.0.0.1:7890"
+# https = "http://127.0.0.1:7890"
 
 [clash]
 user_agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 
 [[clash.proxy.providers]]
 # primary = true
-# name = ""
-# url = ""
+# name = "xxx"
+# url = "https://xxx"
 # interval = 172800
 
 [clash.app.clashx]
-base_dir = "~/.config/clash"
+config_dir = "~/.config/clash"
 
 [clash.app.clash_verge]
-# base_dir = ""
+# config_dir = ""
 
 [quantumultx.remote.server]
-# tag = ""
-# url = ""
-# img_url = ""
+# tag = "xxx"
+# url = "https://xxx"
+# img_url = "https://xxx.png"
 # interval = 86400

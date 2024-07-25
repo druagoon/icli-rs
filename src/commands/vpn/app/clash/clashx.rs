@@ -40,7 +40,7 @@ impl<'a> VpnClashConfigGenerator for ClashXConfig<'a> {
 
     fn get_profile(primary: &ClashProxyProvider) -> anyhow::Result<ClashProfile> {
         let name = Self::get_profile_name(primary);
-        let cfg_dir = Self::get_app_cfg_dir()?;
+        let cfg_dir = Self::get_app_config_dir()?;
         let mut path = cfg_dir.join(&name);
         path.set_extension("yaml");
         Ok(ClashProfile { name, path })

@@ -36,7 +36,7 @@ impl<'a> VpnClashConfigGenerator for ClashVergeConfig<'a> {
 
     fn get_profile(primary: &ClashProxyProvider) -> anyhow::Result<ClashProfile> {
         let name = Self::get_profile_name(primary);
-        let cfg_dir = Self::get_app_cfg_dir()?;
+        let cfg_dir = Self::get_app_config_dir()?;
         let profiles = cfg_dir.join("profiles.yaml");
         let prof = Profiles::new(profiles);
         // let item = prof.get_item_by_name(&name);
