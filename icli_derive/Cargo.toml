@@ -1,6 +1,6 @@
 [package]
 name = "icli_derive"
-version = "0.1.0"
+version = "1.0.0"
 description = "`icli` is a personal command-line tool, which includes various commonly used utilities."
 repository = "https://github.com/druagoon/icli-rs/tree/master/icli_derive"
 categories = [
