@@ -1,9 +1,9 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use once_cell::sync::Lazy;
 
 #[allow(dead_code)]
-pub static ROOT_DIR: Lazy<&Path> = Lazy::new(|| Path::new(env!("CARGO_MANIFEST_DIR")));
+pub static ROOT_DIR: Lazy<PathBuf> = Lazy::new(|| std::env::current_dir().unwrap());
 
 #[allow(dead_code)]
 pub static SRC_DIR: Lazy<PathBuf> = Lazy::new(|| ROOT_DIR.join("src"));
