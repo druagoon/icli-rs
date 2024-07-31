@@ -30,33 +30,30 @@ impl Config {
     const USER_CONFIG_FILE: &'static str = "~/.config/icli/config.toml";
 
     pub fn new() -> anyhow::Result<Self> {
-        let mut cb = ::config::Config::builder()
-            .add_source(::config::File::from_str(DEFAULT_CONFIG, ::config::FileFormat::Toml))
-            .add_source(::config::File::from_str(OS_DEFAULT_CONFIG, ::config::FileFormat::Toml));
-        let mut cfg_files = Self::locate_config_files();
-        cfg_files.reverse();
-        for p in &cfg_files {
-            cb = cb.add_source(::config::File::with_name(p.to_str().unwrap()).required(false));
-        }
-        let cfg = cb.build()?;
-        Ok(cfg.try_deserialize::<Self>()?)
+        let sources = vec![
+            ::config::File::from_str(DEFAULT_CONFIG, ::config::FileFormat::Toml),
+            ::config::File::from_str(OS_DEFAULT_CONFIG, ::config::FileFormat::Toml),
+        ];
+        let files: Vec<_> = Self::locate_config_files()
+            .iter()
+            .rev()
+            .filter(|&x| x.exists())
+            .map(|x| ::config::File::from(x.to_owned()).required(false))
+            .collect();
+        let cfg = ::config::Config::builder()
+            .add_source(sources)
+            .add_source(files)
+            .build()?
+            .try_deserialize::<Self>()?;
+        Ok(cfg)
     }
 
     fn locate_config_files() -> Vec<PathBuf> {
-        let mut files = vec![];
-        let mut path = std::env::current_dir().unwrap();
-        files.push(Self::get_config_file(&path));
-        while let Some(parent) = path.parent() {
-            let cf = Self::get_config_file(parent);
-            files.push(cf);
-            path.pop();
-        }
-        let default = Self::get_user_config_file();
-        files.push(Path::new(&default).to_path_buf());
-        files
+        let path = std::env::current_dir().unwrap();
+        vec![Self::get_path_config_file(path), PathBuf::from(Self::get_user_config_file())]
     }
 
-    pub fn get_config_file<T: AsRef<Path>>(p: T) -> PathBuf {
+    pub fn get_path_config_file<T: AsRef<Path>>(p: T) -> PathBuf {
         let suffix = PathBuf::from_iter(Self::CONFIG_PATH_SUFFIX);
         p.as_ref().join(suffix)
     }
