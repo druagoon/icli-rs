@@ -3,7 +3,7 @@ use std::ops::Deref;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-use tera::{Context, Tera};
+use anyhow::Context;
 
 use crate::consts;
 use crate::prelude::*;
@@ -27,7 +27,10 @@ impl CliCommand for NewCmd {
         let engine = &init_engine()?;
         let mut pb = PathBuf::from_str(&self.path)?;
 
-        std::env::set_current_dir(consts::COMMANDS_DIR.deref())?;
+        let cmd_dir = consts::COMMANDS_DIR.deref();
+        std::env::set_current_dir(cmd_dir).with_context(|| {
+            format!("can't find the commands directory: {:?}", cmd_dir.as_os_str())
+        })?;
         create_cmd(engine, &pb)?;
         create_mod(engine, &mut pb)?;
 
@@ -35,8 +38,8 @@ impl CliCommand for NewCmd {
     }
 }
 
-fn init_engine() -> tera::Result<Tera> {
-    let mut engine = Tera::default();
+fn init_engine() -> tera::Result<tera::Tera> {
+    let mut engine = tera::Tera::default();
     engine.add_raw_templates(CLI_TEMPLATES)?;
     Ok(engine)
 }
@@ -50,7 +53,7 @@ fn make_name<T: AsRef<Path>>(p: &T) -> String {
     heck::AsPascalCase(p.as_ref().to_str().unwrap()).to_string()
 }
 
-fn create_cmd(engine: &Tera, pb: &PathBuf) -> anyhow::Result<()> {
+fn create_cmd(engine: &tera::Tera, pb: &PathBuf) -> anyhow::Result<()> {
     let mut filepath = make_path(pb);
     filepath.set_extension("rs");
     if !filepath.is_file() {
@@ -61,7 +64,7 @@ fn create_cmd(engine: &Tera, pb: &PathBuf) -> anyhow::Result<()> {
     }
 
     let name_c = make_name(pb);
-    let mut ctx = Context::new();
+    let mut ctx = tera::Context::new();
     ctx.insert("name_c", &name_c);
 
     let fp = fs::File::create(&filepath)?;
@@ -70,7 +73,7 @@ fn create_cmd(engine: &Tera, pb: &PathBuf) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn create_mod(engine: &Tera, pb: &mut PathBuf) -> anyhow::Result<()> {
+fn create_mod(engine: &tera::Tera, pb: &mut PathBuf) -> anyhow::Result<()> {
     let mut is_subcommand = false;
 
     while let Some(prev) = pb.parent() {
@@ -101,7 +104,7 @@ fn create_mod(engine: &Tera, pb: &mut PathBuf) -> anyhow::Result<()> {
             let has_c_attrs = !attrs.is_empty();
             let c_attrs = attrs.join(", ");
 
-            let mut ctx = Context::new();
+            let mut ctx = tera::Context::new();
             ctx.insert("group", &group);
             ctx.insert("name", name);
             ctx.insert("name_v", &name_v);
