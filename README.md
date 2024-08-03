@@ -1,7 +1,8 @@
 <h1>icli-rs</h1>
 
+![GitHub license](https://img.shields.io/github/license/druagoon/icli-rs)
+[![GitHub Release](https://img.shields.io/github/v/release/druagoon/icli-rs)](https://github.com/druagoon/icli-rs/releases)
 [![GitHub issues](https://img.shields.io/github/issues/druagoon/icli-rs)](https://github.com/druagoon/icli-rs/issues)
-[![GitHub license](https://img.shields.io/github/license/druagoon/icli-rs)](https://github.com/druagoon/icli-rs/blob/master/LICENSE)
 
 `icli` is a personal command-line tool, which includes various commonly used utilities.
 
