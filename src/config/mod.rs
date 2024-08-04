@@ -48,7 +48,7 @@ impl Config {
         Ok(cfg)
     }
 
-    fn locate_config_files() -> Vec<PathBuf> {
+    pub fn locate_config_files() -> Vec<PathBuf> {
         let path = std::env::current_dir().unwrap();
         vec![Self::get_path_config_file(path), PathBuf::from(Self::get_user_config_file())]
     }
