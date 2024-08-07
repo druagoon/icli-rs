@@ -1,2 +1,5 @@
+[clash.app.clashx]
+config_dir = "~/.config/clash"
+
 [clash.app.clash_verge]
 config_dir = "~/Library/Application Support/io.github.clash-verge-rev.clash-verge-rev"

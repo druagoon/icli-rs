@@ -7,6 +7,7 @@ use crate::de::deserialize_path;
 
 #[derive(serde::Deserialize, serde::Serialize, Debug)]
 pub struct Clash {
+    #[serde(default)]
     pub user_agent: String,
     pub proxy: ClashProxy,
     pub app: ClashApp,

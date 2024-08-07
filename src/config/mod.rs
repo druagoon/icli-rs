@@ -8,7 +8,7 @@ use once_cell::sync::Lazy;
 
 use crate::include_template;
 
-const DEFAULT_CONFIG: &str = include_template!("config/default.toml");
+pub const DEFAULT_CONFIG: &str = include_template!("config/default.toml");
 #[cfg(target_os = "linux")]
 const OS_DEFAULT_CONFIG: &str = include_template!("config/linux.toml");
 #[cfg(target_os = "macos")]
@@ -49,8 +49,7 @@ impl Config {
     }
 
     pub fn locate_config_files() -> Vec<PathBuf> {
-        let path = std::env::current_dir().unwrap();
-        vec![Self::get_path_config_file(path), PathBuf::from(Self::get_user_config_file())]
+        vec![Self::get_local_config_file(), Self::get_user_config_file()]
     }
 
     pub fn get_path_config_file<T: AsRef<Path>>(p: T) -> PathBuf {
@@ -58,9 +57,14 @@ impl Config {
         p.as_ref().join(suffix)
     }
 
-    pub fn get_user_config_file() -> String {
+    pub fn get_local_config_file() -> PathBuf {
+        let cwd = std::env::current_dir().unwrap();
+        Self::get_path_config_file(cwd)
+    }
+
+    pub fn get_user_config_file() -> PathBuf {
         let file = shellexpand::tilde(Self::USER_CONFIG_FILE);
-        file.to_string()
+        PathBuf::from(file.to_string())
     }
 }
 
