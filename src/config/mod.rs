@@ -6,6 +6,7 @@ use std::path::{Path, PathBuf};
 
 use once_cell::sync::Lazy;
 
+use crate::consts::{CONFIG_DIR, PROJECT_DOT_ID};
 use crate::include_template;
 
 pub const DEFAULT_CONFIG: &str = include_template!("config/default.toml");
@@ -15,6 +16,8 @@ const OS_DEFAULT_CONFIG: &str = include_template!("config/linux.toml");
 const OS_DEFAULT_CONFIG: &str = include_template!("config/macos.toml");
 #[cfg(target_os = "windows")]
 const OS_DEFAULT_CONFIG: &str = include_template!("config/windows.toml");
+
+const CONFIG_FILENAME: &str = "config.toml";
 
 #[derive(serde::Deserialize, serde::Serialize, Debug)]
 pub struct Config {
@@ -26,9 +29,6 @@ pub struct Config {
 }
 
 impl Config {
-    const CONFIG_PATH_SUFFIX: [&'static str; 2] = [".icli", "config.toml"];
-    const USER_CONFIG_FILE: &'static str = "~/.config/icli/config.toml";
-
     pub fn new() -> anyhow::Result<Self> {
         let sources = vec![
             ::config::File::from_str(DEFAULT_CONFIG, ::config::FileFormat::Toml),
@@ -48,23 +48,30 @@ impl Config {
         Ok(cfg)
     }
 
+    fn _get_local_file<T: AsRef<Path>>(p: T) -> PathBuf {
+        std::env::current_dir().unwrap().join(PROJECT_DOT_ID).join(p)
+    }
+
+    fn _get_user_file<T: AsRef<Path>>(p: T) -> PathBuf {
+        CONFIG_DIR.join(p)
+    }
+
     pub fn locate_config_files() -> Vec<PathBuf> {
         vec![Self::get_local_config_file(), Self::get_user_config_file()]
     }
 
-    pub fn get_path_config_file<T: AsRef<Path>>(p: T) -> PathBuf {
-        let suffix = PathBuf::from_iter(Self::CONFIG_PATH_SUFFIX);
-        p.as_ref().join(suffix)
-    }
-
     pub fn get_local_config_file() -> PathBuf {
-        let cwd = std::env::current_dir().unwrap();
-        Self::get_path_config_file(cwd)
+        Self::_get_local_file(CONFIG_FILENAME)
     }
 
     pub fn get_user_config_file() -> PathBuf {
-        let file = shellexpand::tilde(Self::USER_CONFIG_FILE);
-        PathBuf::from(file.to_string())
+        Self::_get_user_file(CONFIG_FILENAME)
+    }
+
+    #[allow(dead_code)]
+    pub fn locate_template_files<T: AsRef<Path>>(p: T) -> Vec<PathBuf> {
+        let suffix = Path::new("templates").join(p);
+        vec![Self::_get_local_file(&suffix), Self::_get_user_file(&suffix)]
     }
 }
 

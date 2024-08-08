@@ -8,15 +8,14 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use reqwest::blocking::Client;
-use tera::Tera;
 
 use crate::commands::vpn::makeconfig::VpnMakeConfigCmd;
 use crate::commands::vpn::VpnConfigGenerator;
 use crate::config::clash::{ClashAppName, ClashProxyProvider};
+use crate::config::Config;
 use crate::prelude::*;
 
-const CLASH_PROVIDER_PROFILE_TEMPLATE_NAME: &str = "profile.provider.yaml";
-const CLASH_PROVIDER_PROFILE_TEMPLATE: &str = include_template!("vpn/clash/profile.provider.yaml");
+const CLASH_PROVIDER_PROFILE_TEMPLATE: &str = "vpn/clash/profile.provider.yaml";
 
 #[allow(dead_code)]
 #[derive(Debug)]
@@ -29,6 +28,24 @@ pub struct ClashProfile {
 trait VpnClashConfigGenerator: VpnConfigGenerator {
     fn get_cmd(&self) -> &VpnMakeConfigCmd;
 
+    fn get_default_template(&self) -> Option<PathBuf> {
+        let files = Config::locate_template_files(CLASH_PROVIDER_PROFILE_TEMPLATE);
+        files.into_iter().find(|x| x.exists())
+    }
+
+    fn get_template(&self) -> Option<PathBuf> {
+        self.get_cmd().get_template().or(self.get_default_template())
+    }
+
+    fn get_template_engine(&self) -> anyhow::Result<tera::Tera> {
+        let path = self
+            .get_template()
+            .ok_or(anyhow::format_err!("could not find the config template file for clash"))?;
+        let mut engine = tera::Tera::default();
+        engine.add_template_file(path, Some(CLASH_PROVIDER_PROFILE_TEMPLATE))?;
+        Ok(engine)
+    }
+
     fn get_request_client() -> reqwest::Result<Client> {
         let mut cb = Client::builder();
         let ua = CONFIG.get_clash_user_agent();
@@ -40,15 +57,6 @@ trait VpnClashConfigGenerator: VpnConfigGenerator {
             cb = cb.proxy(reqwest::Proxy::all(all_proxy)?);
         }
         cb.build()
-    }
-
-    fn get_template_engine() -> tera::Result<Tera> {
-        let mut engine = Tera::default();
-        engine.add_raw_templates(vec![(
-            CLASH_PROVIDER_PROFILE_TEMPLATE_NAME,
-            CLASH_PROVIDER_PROFILE_TEMPLATE,
-        )])?;
-        Ok(engine)
     }
 
     fn get_app_name() -> &'static ClashAppName;
@@ -107,11 +115,11 @@ trait VpnClashConfigGenerator: VpnConfigGenerator {
         &self,
         primary: &ClashProxyProvider,
     ) -> anyhow::Result<serde_yaml::Mapping> {
-        let engine = Self::get_template_engine()?;
+        let engine = self.get_template_engine()?;
         let mut ctx = tera::Context::new();
         ctx.insert("clash", &CONFIG.clash);
         ctx.insert("primary", primary);
-        let text = engine.render(CLASH_PROVIDER_PROFILE_TEMPLATE_NAME, &ctx)?;
+        let text = engine.render(CLASH_PROVIDER_PROFILE_TEMPLATE, &ctx)?;
         let mut block: serde_yaml::Mapping = serde_yaml::from_str(&text)?;
         let rule_providers = block.get_mut("rule-providers").unwrap();
         let rule_providers_kv: HashMap<String, ClashRuleProviderItem> =

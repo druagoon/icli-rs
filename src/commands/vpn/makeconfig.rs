@@ -15,14 +15,17 @@ pub struct VpnMakeConfigCmd {
     /// VPN client app.
     #[arg(long, value_enum)]
     app: VpnApp,
+    /// Path to the template file for generating config files.
+    #[arg(short = 't', long)]
+    pub template: Option<String>,
     /// Download clash provider rules to local.
     #[cfg(feature = "clash")]
     #[arg(long)]
     download_rules: bool,
     /// Write QuantumultX.conf to DIR.
     #[cfg(feature = "quantumultx")]
-    #[arg(long, value_name = "DIR")]
-    output_dir: Option<PathBuf>,
+    #[arg(long, value_name = "DIR", default_value = "./output")]
+    output_dir: String,
 }
 
 #[derive(clap::ValueEnum, Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -43,17 +46,22 @@ enum VpnApp {
 
 impl VpnMakeConfigCmd {
     #[allow(dead_code)]
+    pub fn get_template(&self) -> Option<PathBuf> {
+        self.template.as_ref().map(|x| {
+            let cfg_dir = shellexpand::tilde(x);
+            PathBuf::from(cfg_dir.to_string())
+        })
+    }
+
+    #[allow(dead_code)]
     pub fn is_download_rules(&self) -> bool {
         self.download_rules
     }
 
     #[allow(dead_code)]
-    pub fn get_output_dir(&self) -> Option<PathBuf> {
-        if let Some(ref p) = self.output_dir {
-            let s = shellexpand::tilde(p.to_str().unwrap());
-            return Some(PathBuf::from(s.to_string()));
-        }
-        None
+    pub fn get_output_dir(&self) -> PathBuf {
+        let s = shellexpand::tilde(&self.output_dir);
+        PathBuf::from(s.to_string())
     }
 }
 

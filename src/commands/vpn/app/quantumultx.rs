@@ -1,14 +1,15 @@
 #![cfg(feature = "quantumultx")]
 
 use std::fs;
+use std::path::PathBuf;
 
 use crate::commands::vpn::makeconfig::VpnMakeConfigCmd;
 use crate::commands::vpn::VpnConfigGenerator;
+use crate::config::Config;
 use crate::prelude::*;
 
-const QUANTUMULTX_CONFIG_NAME: &str = "QuantumultX.conf";
-const QUANTUMULTX_TEMPLATES: [(&str, &str); 1] =
-    [(QUANTUMULTX_CONFIG_NAME, include_template!("vpn/quantumultx/QuantumultX.conf"))];
+const QUANTUMULTX_CONF: &str = "QuantumultX.conf";
+const QUANTUMULTX_TEMPLATE: &str = "vpn/quantumultx/QuantumultX.conf";
 
 #[allow(dead_code)]
 pub struct QuantumultXConfig<'a> {
@@ -22,25 +23,39 @@ impl<'a> QuantumultXConfig<'a> {
     }
 }
 
-impl<'a> VpnConfigGenerator for QuantumultXConfig<'a> {
-    fn make(&self) -> anyhow::Result<()> {
-        let engine = get_template_engine()?;
-        let output_dir = self.cmd.get_output_dir().unwrap_or(std::env::current_dir()?);
-        if !output_dir.is_dir() {
-            fs::create_dir_all(&output_dir)?
-        }
-        let output = output_dir.join(QUANTUMULTX_CONFIG_NAME);
-        let fp = fs::File::create(&output)?;
-        let mut ctx = tera::Context::new();
-        ctx.insert("quantumultx", &CONFIG.quantumultx);
-        engine.render_to(QUANTUMULTX_CONFIG_NAME, &ctx, fp)?;
-        log::info!("write {:?} ... done", output);
-        Ok(())
+impl<'a> QuantumultXConfig<'a> {
+    fn get_default_template(&self) -> Option<PathBuf> {
+        let files = Config::locate_template_files(QUANTUMULTX_TEMPLATE);
+        files.into_iter().find(|x| x.exists())
+    }
+
+    fn get_template(&self) -> Option<PathBuf> {
+        self.cmd.get_template().or(self.get_default_template())
+    }
+
+    fn get_template_engine(&self) -> anyhow::Result<tera::Tera> {
+        let path = self.get_template().ok_or(anyhow::format_err!(
+            "could not find the config template file for quantumultx"
+        ))?;
+        let mut engine = tera::Tera::default();
+        engine.add_template_file(path, Some(QUANTUMULTX_CONF))?;
+        Ok(engine)
     }
 }
 
-fn get_template_engine() -> tera::Result<tera::Tera> {
-    let mut engine = tera::Tera::default();
-    engine.add_raw_templates(QUANTUMULTX_TEMPLATES)?;
-    Ok(engine)
+impl<'a> VpnConfigGenerator for QuantumultXConfig<'a> {
+    fn make(&self) -> anyhow::Result<()> {
+        let engine = self.get_template_engine()?;
+        let output_dir = self.cmd.get_output_dir();
+        if !output_dir.is_dir() {
+            fs::create_dir_all(&output_dir)?
+        }
+        let output = output_dir.join(QUANTUMULTX_CONF);
+        let fp = fs::File::create(&output)?;
+        let mut ctx = tera::Context::new();
+        ctx.insert("quantumultx", &CONFIG.quantumultx);
+        engine.render_to(QUANTUMULTX_CONF, &ctx, fp)?;
+        log::info!("write {:?} ... done", output);
+        Ok(())
+    }
 }
