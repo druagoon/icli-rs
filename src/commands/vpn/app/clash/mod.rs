@@ -18,10 +18,48 @@ use crate::prelude::*;
 const CLASH_PROVIDER_PROFILE_TEMPLATE: &str = "vpn/clash/profile.provider.yaml";
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(serde::Serialize, Debug)]
+pub struct ClashContext<'a> {
+    app: ClashContextApp,
+    profile: ClashProfile,
+    primary: &'a ClashProxyProvider,
+}
+
+impl<'a> ClashContext<'a> {
+    #[allow(dead_code)]
+    pub fn new(
+        app: ClashContextApp,
+        profile: ClashProfile,
+        primary: &'a ClashProxyProvider,
+    ) -> Self {
+        Self { app, profile, primary }
+    }
+}
+
+#[allow(dead_code)]
+#[derive(serde::Serialize, Debug)]
+pub struct ClashContextApp {
+    name: String,
+}
+
+impl ClashContextApp {
+    #[allow(dead_code)]
+    pub fn new(name: String) -> Self {
+        Self { name }
+    }
+}
+
+#[allow(dead_code)]
+#[derive(serde::Serialize, Debug)]
 pub struct ClashProfile {
     name: String,
     path: PathBuf,
+}
+
+impl ClashProfile {
+    pub fn new(name: String, path: PathBuf) -> Self {
+        Self { name, path }
+    }
 }
 
 #[allow(dead_code)]
@@ -46,7 +84,7 @@ trait VpnClashConfigGenerator: VpnConfigGenerator {
         Ok(engine)
     }
 
-    fn get_request_client() -> reqwest::Result<Client> {
+    fn get_request_client(&self) -> reqwest::Result<Client> {
         let mut cb = Client::builder();
         let ua = CONFIG.get_clash_user_agent();
         if !ua.is_empty() {
@@ -59,50 +97,53 @@ trait VpnClashConfigGenerator: VpnConfigGenerator {
         cb.build()
     }
 
-    fn get_app_name() -> &'static ClashAppName;
+    fn get_app_name(&self) -> &'static ClashAppName;
 
-    fn get_app_config_dir() -> anyhow::Result<PathBuf> {
-        let app_name = Self::get_app_name();
+    fn get_app_config_dir(&self) -> anyhow::Result<PathBuf> {
+        let app_name = self.get_app_name();
         CONFIG
             .get_clash_app_config_dir(app_name)
             .to_owned()
             .ok_or(anyhow::format_err!("clash app config directory is not set"))
     }
 
-    fn get_primary_proxy() -> anyhow::Result<&'static ClashProxyProvider> {
+    fn get_primary_proxy(&self) -> anyhow::Result<&'static ClashProxyProvider> {
         CONFIG
             .get_clash_primary_proxy_provider()
             .ok_or(anyhow::format_err!("clash primary proxy provider not found"))
     }
 
-    fn get_profile_name(primary: &ClashProxyProvider) -> String {
+    fn get_profile_name(&self, primary: &ClashProxyProvider) -> String {
         format!("{}X", primary.name)
     }
 
-    fn get_profile(primary: &ClashProxyProvider) -> anyhow::Result<ClashProfile>;
+    fn get_profile(&self, primary: &ClashProxyProvider) -> anyhow::Result<ClashProfile>;
+
+    fn get_context(&self) -> anyhow::Result<ClashContext> {
+        let primary = self.get_primary_proxy()?;
+        let app = ClashContextApp::new(self.get_app_name().to_string());
+        let profile = self.get_profile(primary)?;
+        Ok(ClashContext::new(app, profile, primary))
+    }
 
     fn make_profile(&self) -> anyhow::Result<()> {
-        let primary = Self::get_primary_proxy()?;
-        let profile = Self::get_profile(primary)?;
-        log::info!("{:?}", &profile);
-        let pd = profile.path.parent().unwrap();
-        if !pd.is_dir() {
-            fs::create_dir_all(pd)?;
+        let ctx = self.get_context()?;
+        log::info!("clash context: {}", serde_json::to_string(&ctx)?);
+        let profile_dir = ctx.profile.path.parent().unwrap();
+        if !profile_dir.is_dir() {
+            fs::create_dir_all(profile_dir)?;
         }
-        let fp = fs::File::create(profile.path)?;
-        let remote = self.make_remote_profile(primary)?;
+        let fp = fs::File::create(&ctx.profile.path)?;
+        let remote = self.make_remote_profile(&ctx)?;
         serde_yaml::to_writer(&fp, &remote)?;
-        let local = self.make_local_profile(primary)?;
+        let local = self.make_local_profile(&ctx)?;
         serde_yaml::to_writer(&fp, &local)?;
         Ok(())
     }
 
-    fn make_remote_profile(
-        &self,
-        primary: &ClashProxyProvider,
-    ) -> anyhow::Result<serde_yaml::Mapping> {
-        let client = Self::get_request_client()?;
-        let resp = client.get(&primary.url).send()?;
+    fn make_remote_profile(&self, ctx: &ClashContext) -> anyhow::Result<serde_yaml::Mapping> {
+        let client = self.get_request_client()?;
+        let resp = client.get(&ctx.primary.url).send()?;
         let mut block: serde_yaml::Mapping = serde_yaml::from_reader(resp)?;
 
         // Remove yaml unneeded keys
@@ -111,15 +152,12 @@ trait VpnClashConfigGenerator: VpnConfigGenerator {
         Ok(block)
     }
 
-    fn make_local_profile(
-        &self,
-        primary: &ClashProxyProvider,
-    ) -> anyhow::Result<serde_yaml::Mapping> {
+    fn make_local_profile(&self, ctx: &ClashContext) -> anyhow::Result<serde_yaml::Mapping> {
         let engine = self.get_template_engine()?;
-        let mut ctx = tera::Context::new();
-        ctx.insert("clash", &CONFIG.clash);
-        ctx.insert("primary", primary);
-        let text = engine.render(CLASH_PROVIDER_PROFILE_TEMPLATE, &ctx)?;
+        let mut tpl_ctx = tera::Context::new();
+        tpl_ctx.insert("clash", &CONFIG.clash);
+        tpl_ctx.insert("primary", ctx.primary);
+        let text = engine.render(CLASH_PROVIDER_PROFILE_TEMPLATE, &tpl_ctx)?;
         let mut block: serde_yaml::Mapping = serde_yaml::from_str(&text)?;
         let rule_providers = block.get_mut("rule-providers").unwrap();
         let rule_providers_kv: HashMap<String, ClashRuleProviderItem> =
@@ -127,7 +165,7 @@ trait VpnClashConfigGenerator: VpnConfigGenerator {
 
         let cmd = self.get_cmd();
         if cmd.is_download_rules() {
-            Self::make_rules(rule_providers_kv)?;
+            self.make_rules(rule_providers_kv)?;
         }
 
         // Remove rule providers unneeded keys
@@ -144,22 +182,30 @@ trait VpnClashConfigGenerator: VpnConfigGenerator {
         Ok(block)
     }
 
-    fn make_rules(rule_providers_kv: HashMap<String, ClashRuleProviderItem>) -> anyhow::Result<()> {
-        let cfg_dir = Self::get_app_config_dir()?;
-        let client = Self::get_request_client()?;
-        log::info!("starting download rules ...");
+    fn make_rules(
+        &self,
+        rule_providers_kv: HashMap<String, ClashRuleProviderItem>,
+    ) -> anyhow::Result<()> {
+        let cfg_dir = self.get_app_config_dir()?;
+        let client = self.get_request_client()?;
+        println!("starting download rules ...");
         for item in rule_providers_kv
             .values()
             .filter(|&item| !(item.url.is_empty() || item.path.is_empty()))
         {
             let target = std::path::absolute(cfg_dir.join(&item.path))?;
             println!("{} ==> {}", item.url, item.path);
-            Self::fetch_rule(&client, &item.url, &target)?;
+            self.fetch_rule(&client, &item.url, &target)?;
         }
         Ok(())
     }
 
-    fn fetch_rule<P: AsRef<Path>>(client: &Client, url: &str, filepath: P) -> anyhow::Result<()> {
+    fn fetch_rule<P: AsRef<Path>>(
+        &self,
+        client: &Client,
+        url: &str,
+        filepath: P,
+    ) -> anyhow::Result<()> {
         let mut response = client.get(url).send()?;
         let file_dir = filepath.as_ref().parent().unwrap();
         if !file_dir.is_dir() {

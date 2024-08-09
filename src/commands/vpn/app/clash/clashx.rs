@@ -34,19 +34,24 @@ impl<'a> VpnClashConfigGenerator for ClashXConfig<'a> {
         self.cmd
     }
 
-    fn get_app_name() -> &'static ClashAppName {
+    fn get_app_name(&self) -> &'static ClashAppName {
         &ClashAppName::ClashX
     }
 
-    fn get_profile(primary: &ClashProxyProvider) -> anyhow::Result<ClashProfile> {
-        let name = Self::get_profile_name(primary);
-        let cfg_dir = Self::get_app_config_dir()?;
+    fn get_profile(&self, primary: &ClashProxyProvider) -> anyhow::Result<ClashProfile> {
+        let name = self.get_profile_name(primary);
+        let cfg_dir = self.get_app_config_dir()?;
         let mut path = cfg_dir.join(&name);
         path.set_extension("yaml");
-        Ok(ClashProfile { name, path })
+        Ok(ClashProfile::new(name, path))
     }
 
-    fn fetch_rule<P: AsRef<Path>>(client: &Client, url: &str, filepath: P) -> anyhow::Result<()> {
+    fn fetch_rule<P: AsRef<Path>>(
+        &self,
+        client: &Client,
+        url: &str,
+        filepath: P,
+    ) -> anyhow::Result<()> {
         let response = client.get(url).send()?;
         let bytes = response.bytes()?;
         let re = Regex::new(r"(?ms)^\s+-\s+IP-ASN,.+")?;

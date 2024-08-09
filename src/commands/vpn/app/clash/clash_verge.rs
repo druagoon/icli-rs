@@ -30,13 +30,13 @@ impl<'a> VpnClashConfigGenerator for ClashVergeConfig<'a> {
         self.cmd
     }
 
-    fn get_app_name() -> &'static ClashAppName {
+    fn get_app_name(&self) -> &'static ClashAppName {
         &ClashAppName::ClashVerge
     }
 
-    fn get_profile(primary: &ClashProxyProvider) -> anyhow::Result<ClashProfile> {
-        let name = Self::get_profile_name(primary);
-        let cfg_dir = Self::get_app_config_dir()?;
+    fn get_profile(&self, primary: &ClashProxyProvider) -> anyhow::Result<ClashProfile> {
+        let name = self.get_profile_name(primary);
+        let cfg_dir = self.get_app_config_dir()?;
         let profiles = cfg_dir.join("profiles.yaml");
         let prof = Profiles::new(profiles);
         // let item = prof.get_item_by_name(&name);
@@ -46,7 +46,7 @@ impl<'a> VpnClashConfigGenerator for ClashVergeConfig<'a> {
         let filename = prof.get_filename_by_name(&name).expect("profile filename not found");
         let mut path = cfg_dir.join("profiles").join(filename);
         path.set_extension("yaml");
-        Ok(ClashProfile { name, path })
+        Ok(ClashProfile::new(name, path))
     }
 }
 
