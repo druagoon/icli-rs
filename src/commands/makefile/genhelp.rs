@@ -8,7 +8,7 @@ use crate::prelude::*;
 
 /// Generate the help target for Makefile.
 #[derive(clap::Parser, Debug)]
-pub struct MakefileAddHelpCmd {
+pub struct MakefileGenHelpCmd {
     /// Where the help target shell is placed, relative to the current
     /// directory.
     #[arg(long, default_value = ".make")]
@@ -22,7 +22,7 @@ const MAKEFILE_HELP_TEMPLATE_NAME: &str = "help";
 const MAKEFILE_TEMPLATES: [(&str, &str); 1] =
     [(MAKEFILE_HELP_TEMPLATE_NAME, include_template!("makefile/help"))];
 
-impl CliCommand for MakefileAddHelpCmd {
+impl CliCommand for MakefileGenHelpCmd {
     fn run(&self) -> CliResult {
         let engine = &init_engine()?;
         generate(engine, &self.shell_dir, &self.description)?;

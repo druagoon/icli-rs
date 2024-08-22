@@ -1,9 +1,10 @@
-mod add_help;
+mod genhelp;
 
 use crate::prelude::*;
 
 /// Makefile utilities.
 #[derive(clap::Subcommand, icli_derive::CliCommand, Debug)]
 pub enum MakefileCmd {
-    AddHelp(add_help::MakefileAddHelpCmd),
+    #[command(name = "genhelp")]
+    GenHelp(genhelp::MakefileGenHelpCmd),
 }
