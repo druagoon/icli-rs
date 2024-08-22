@@ -3,13 +3,14 @@ name = "icli_derive"
 version = "1.0.0"
 description = "`icli` is a personal command-line tool, which includes various commonly used utilities."
 repository = "https://github.com/druagoon/icli-rs/tree/master/icli_derive"
+license.workspace = true
+edition.workspace = true
+publish = false
 categories = [
     "command-line-interface",
     "development-tools::procedural-macro-helpers",
 ]
 keywords = ["icli", "cli", "parse", "derive", "proc_macro"]
-license.workspace = true
-edition.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

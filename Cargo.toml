@@ -13,6 +13,7 @@ description = "`icli` is a personal command-line tool, which includes various co
 repository = "https://github.com/druagoon/icli-rs"
 edition.workspace = true
 license.workspace = true
+publish = false
 categories = ["command-line-interface"]
 keywords = ["icli", "cli"]
 

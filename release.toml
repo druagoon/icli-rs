@@ -1,0 +1,10 @@
+allow-branch = ["master"]
+pre-release-hook = [
+    "git",
+    "cliff",
+    "-o",
+    "CHANGELOG.md",
+    "--tag",
+    "v{{version}}",
+]
+publish = false
