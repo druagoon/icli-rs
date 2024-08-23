@@ -3,6 +3,7 @@ mod config;
 mod ip;
 mod makefile;
 mod new;
+mod shinc;
 mod vpn;
 
 use crate::prelude::*;
@@ -15,6 +16,8 @@ pub enum Command {
     Ip(ip::IpCmd),
     #[command(subcommand)]
     Makefile(makefile::MakefileCmd),
+    #[command(subcommand)]
+    Shinc(shinc::ShincCmd),
     #[cfg(feature = "vpn")]
     #[command(subcommand)]
     Vpn(vpn::VpnCmd),
