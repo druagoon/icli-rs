@@ -2,19 +2,19 @@
 
 #[derive(serde::Deserialize, serde::Serialize, Debug)]
 pub struct QuantumultX {
-    pub remote: QuantumultXSection,
-    pub mitm: QuantumultXSectionMITM,
+    pub remote: Remote,
+    pub mitm: Mitm,
 }
 
 #[allow(dead_code)]
 #[derive(serde::Deserialize, serde::Serialize, Debug)]
-pub struct QuantumultXSection {
-    pub server: QuantumultXSectionServer,
+pub struct Remote {
+    pub server: Server,
 }
 
 #[allow(dead_code)]
 #[derive(serde::Deserialize, serde::Serialize, Debug)]
-pub struct QuantumultXSectionServer {
+pub struct Server {
     #[serde(default)]
     pub tag: String,
     #[serde(default)]
@@ -27,7 +27,7 @@ pub struct QuantumultXSectionServer {
 
 #[allow(dead_code)]
 #[derive(serde::Deserialize, serde::Serialize, Debug)]
-pub struct QuantumultXSectionMITM {
+pub struct Mitm {
     #[serde(default)]
     pub passphrase: String,
     #[serde(default)]
