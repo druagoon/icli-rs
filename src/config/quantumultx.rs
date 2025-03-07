@@ -3,6 +3,7 @@
 #[derive(serde::Deserialize, serde::Serialize, Debug)]
 pub struct QuantumultX {
     pub remote: QuantumultXSection,
+    pub mitm: QuantumultXSectionMITM,
 }
 
 #[allow(dead_code)]
@@ -22,4 +23,13 @@ pub struct QuantumultXSectionServer {
     pub img_url: String,
     #[serde(default)]
     pub interval: u32,
+}
+
+#[allow(dead_code)]
+#[derive(serde::Deserialize, serde::Serialize, Debug)]
+pub struct QuantumultXSectionMITM {
+    #[serde(default)]
+    pub passphrase: String,
+    #[serde(default)]
+    pub p12: String,
 }
