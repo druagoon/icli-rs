@@ -16,7 +16,11 @@ impl CliCommand for IpPs1Cmd {
         let ifaces = interfaces();
         for v in ifaces.iter().filter(|&x| !(x.is_loopback() || x.ips.is_empty())) {
             let inner = v.ips.iter().filter(|&x| x.is_ipv4()).map(|x| {
-                if self.no_name { x.ip().to_string() } else { format!("{}={}", v.name, x.ip()) }
+                if self.no_name {
+                    x.ip().to_string()
+                } else {
+                    format!("{}={}", v.name, x.ip())
+                }
             });
             outputs.extend(inner);
         }
