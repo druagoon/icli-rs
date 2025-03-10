@@ -25,7 +25,7 @@ impl<'a> QuantumultXConfig<'a> {
 
 impl QuantumultXConfig<'_> {
     fn get_default_template(&self) -> Option<PathBuf> {
-        let files = Config::locate_template_files(QUANTUMULTX_TEMPLATE);
+        let files = Config::locate_template_paths(QUANTUMULTX_TEMPLATE);
         files.into_iter().find(|x| x.exists())
     }
 

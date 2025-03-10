@@ -67,7 +67,7 @@ trait VpnClashConfigGenerator: VpnConfigGenerator {
     fn get_cmd(&self) -> &VpnMakeConfigCmd;
 
     fn get_default_template(&self) -> Option<PathBuf> {
-        let files = Config::locate_template_files(CLASH_PROVIDER_PROFILE_TEMPLATE);
+        let files = Config::locate_template_paths(CLASH_PROVIDER_PROFILE_TEMPLATE);
         files.into_iter().find(|x| x.exists())
     }
 
