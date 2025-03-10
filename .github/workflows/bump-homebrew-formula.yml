@@ -1,0 +1,27 @@
+name: Bump Homebrew formula
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  bump-homebrew-formula:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Homebrew formula
+        uses: dawidd6/action-homebrew-bump-formula@v4
+        with:
+          # Required, custom GitHub access token with the 'public_repo' and 'workflow' scopes
+          token: ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}
+          # Optional, use the origin repository instead of forking
+          no_fork: true
+          # Optional, defaults to homebrew/core
+          tap: druagoon/homebrew-brew
+          # Formula name, required
+          formula: icli
+          # Optional, will be determined automatically
+          # tag: ${{ github.ref }}
+          # Optional, will be determined automatically
+          # revision: ${{ github.sha }}
+          # Optional, if don't want to check for already open PRs
+          # force: false
