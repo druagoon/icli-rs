@@ -22,14 +22,14 @@ impl<'a> ClashXConfig<'a> {
     }
 }
 
-impl<'a> VpnConfigGenerator for ClashXConfig<'a> {
+impl VpnConfigGenerator for ClashXConfig<'_> {
     fn make(&self) -> anyhow::Result<()> {
         self.make_profile()?;
         Ok(())
     }
 }
 
-impl<'a> VpnClashConfigGenerator for ClashXConfig<'a> {
+impl VpnClashConfigGenerator for ClashXConfig<'_> {
     fn get_cmd(&self) -> &VpnMakeConfigCmd {
         self.cmd
     }

@@ -18,14 +18,14 @@ impl<'a> ClashVergeConfig<'a> {
     }
 }
 
-impl<'a> VpnConfigGenerator for ClashVergeConfig<'a> {
+impl VpnConfigGenerator for ClashVergeConfig<'_> {
     fn make(&self) -> anyhow::Result<()> {
         self.make_profile()?;
         Ok(())
     }
 }
 
-impl<'a> VpnClashConfigGenerator for ClashVergeConfig<'a> {
+impl VpnClashConfigGenerator for ClashVergeConfig<'_> {
     fn get_cmd(&self) -> &VpnMakeConfigCmd {
         self.cmd
     }

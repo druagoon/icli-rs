@@ -23,7 +23,7 @@ impl<'a> QuantumultXConfig<'a> {
     }
 }
 
-impl<'a> QuantumultXConfig<'a> {
+impl QuantumultXConfig<'_> {
     fn get_default_template(&self) -> Option<PathBuf> {
         let files = Config::locate_template_files(QUANTUMULTX_TEMPLATE);
         files.into_iter().find(|x| x.exists())
@@ -43,7 +43,7 @@ impl<'a> QuantumultXConfig<'a> {
     }
 }
 
-impl<'a> VpnConfigGenerator for QuantumultXConfig<'a> {
+impl VpnConfigGenerator for QuantumultXConfig<'_> {
     fn make(&self) -> anyhow::Result<()> {
         let engine = self.get_template_engine()?;
         let output_dir = self.cmd.get_output_dir();
