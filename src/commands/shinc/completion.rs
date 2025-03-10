@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use clap_complete::Shell;
+use clap_complete::aot::Shell;
 
 use super::config::Config;
 use super::env::Env;
