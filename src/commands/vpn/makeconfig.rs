@@ -8,6 +8,7 @@ use super::app::clash::clashx::ClashXConfig;
 use super::app::quantumultx::QuantumultXConfig;
 use super::VpnConfigGenerator;
 use crate::prelude::*;
+use crate::utils::path::expand_tilde;
 
 /// Make config for VPN app.
 #[derive(clap::Parser, Debug)]
@@ -47,10 +48,7 @@ enum VpnApp {
 impl VpnMakeConfigCmd {
     #[allow(dead_code)]
     pub fn get_template(&self) -> Option<PathBuf> {
-        self.template.as_ref().map(|x| {
-            let cfg_dir = shellexpand::tilde(x);
-            PathBuf::from(cfg_dir.to_string())
-        })
+        self.template.as_ref().map(|x| expand_tilde(x))
     }
 
     #[allow(dead_code)]
@@ -60,8 +58,7 @@ impl VpnMakeConfigCmd {
 
     #[allow(dead_code)]
     pub fn get_output_dir(&self) -> PathBuf {
-        let s = shellexpand::tilde(&self.output_dir);
-        PathBuf::from(s.to_string())
+        expand_tilde(&self.output_dir)
     }
 }
 
