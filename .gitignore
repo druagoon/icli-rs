@@ -25,4 +25,5 @@ Cargo.lock
 *.pdb
 
 # Project
+/.config/icli/*
 /output/

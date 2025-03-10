@@ -19,7 +19,7 @@ impl CliCommand for ConfigListCmd {
         for f in files {
             if !self.exists || f.exists() {
                 i += 1;
-                println!("{}: {}", i, f.to_str().unwrap());
+                println!("{}: {}", i, f.display());
             }
             if self.with_content && f.exists() {
                 let content = std::fs::read_to_string(f)?;

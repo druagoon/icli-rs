@@ -63,7 +63,7 @@ help: ## {}
 	@./{} "$(MAKEFILE_LIST)"
 "#,
         description,
-        help_tail.to_str().unwrap()
+        help_tail.display()
     )?;
     Ok(())
 }
