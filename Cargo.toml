@@ -9,7 +9,7 @@ edition = "2021"
 [package]
 name = "icli"
 version = "1.2.0"
-description = "`icli` is a personal command-line tool, which includes various commonly used utilities."
+description = "A personal command-line tool includes various commonly used utilities."
 repository = "https://github.com/druagoon/icli-rs"
 edition.workspace = true
 license.workspace = true

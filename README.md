@@ -1,48 +1,60 @@
+<!-- markdownlint-disable MD033 MD036 -->
 <h1>icli-rs</h1>
 
 ![GitHub license](https://img.shields.io/github/license/druagoon/icli-rs)
 [![GitHub Release](https://img.shields.io/github/v/release/druagoon/icli-rs)](https://github.com/druagoon/icli-rs/releases)
 [![GitHub issues](https://img.shields.io/github/issues/druagoon/icli-rs)](https://github.com/druagoon/icli-rs/issues)
 
-`icli` is a personal command-line tool, which includes various commonly used utilities.
+A personal command-line tool that includes various commonly used utilities.
 
 -----
 
 **Table of Contents**
 
 - [Installation](#installation)
+  - [From Homebrew](#from-homebrew)
   - [From binaries](#from-binaries)
   - [From source](#from-source)
+    - [Windows Prerequisites](#windows-prerequisites)
 - [Configuration](#configuration)
-  - [Built-in default config](#built-in-default-config)
-- [FAQ](#faq)
-  - [How to compile on Windows?](#how-to-compile-on-windows)
+  - [Configuration Merging](#configuration-merging)
+  - [Built-in Default Configs](#built-in-default-configs)
+- [Development](#development)
+  - [Windows Compilation](#windows-compilation)
 - [Changelog](#changelog)
 - [License](#license)
 
+
 ## Installation
+
+### From Homebrew
+
+```shell
+brew install druagoon/brew/icli
+```
 
 ### From binaries
 
-The [releases page](https://github.com/druagoon/icli-rs/releases) includes precompiled binaries for Linux and Windows.\
-Statically-linked binaries are also available: look for archives with `musl` in the file name.
+Download precompiled binaries for Linux/Windows/MacOS from the [releases page](https://github.com/druagoon/icli-rs/releases).
+
+For Linux users, statically-linked binaries (with `musl`) are also available.
 
 ### From source
 
-> MSRV is `1.79.0`
->
-> There are some compilation requirements on Windows, see [FAQ](#how-to-compile-on-windows).
+> Minimum supported Rust version (MSRV): 1.79.0
 
-- Install `Npcap` required by `pnet` crate (**Windows only**)
+#### Windows Prerequisites
+
+Install Npcap SDK (required by `pnet` crate):
 
 ```powershell
-# Windows PowerShell with administrator permissions.
+# Run in PowerShell with administrator permissions
 Invoke-WebRequest -Uri "https://npcap.com/dist/npcap-sdk-1.13.zip" -OutFile "C:/npcap-sdk.zip"
 Expand-Archive -LiteralPath C:/npcap-sdk.zip -DestinationPath C:/npcap-sdk
 $env:LIB="C:/npcap-sdk/Lib/x64"
 ```
 
-- Install from github repository
+Install from repository:
 
 ```shell
 cargo install --locked --all-features --git https://github.com/druagoon/icli-rs.git
@@ -50,38 +62,32 @@ cargo install --locked --all-features --git https://github.com/druagoon/icli-rs.
 
 ## Configuration
 
-`icli` allows local configuration for a particular package as well as global configuration.
-It looks for configuration files in the current directory and user configuration directory (in precedence order).
+Configuration files are loaded in the following order (highest to lowest priority):
 
-- `$PWD/.icli/config.toml`
-- `~/.config/icli/config.toml`:
-  - Windows: `%USERPROFILE%\.config\icli\config.toml`
-  - Unix: `$HOME/.config/icli/config.toml`
+1. Local config: `$PWD/.config/icli/config.toml`
+2. User config:
+   - Windows: `%USERPROFILE%\.config\icli\config.toml`
+   - Unix: `$HOME/.config/icli/config.toml`
+3. Built-in defaults (lowest priority)
 
-If a key is specified in multiple config files, the values will get merged together.\
-Numbers, strings, booleans and arrays will use the value in the current directory configuration first,
-followed by the user configuration directory.\
-Tables will be joined together with higher precedence items being override those with lower precedence.
+### Configuration Merging
 
-> Note:
-***In fact, the built-in default configuration is the lowest priority.***
+- Simple values (numbers, strings, booleans, arrays): Higher priority overrides lower
+- Tables: Merged with higher priority values overriding lower priority ones
 
-### Built-in default config
+### Built-in Default Configs
 
-- Global
-  - [default.toml](./templates/config/default.toml)
-- OS
-  - [linux.toml](./templates/config/linux.toml)
-  - [macos.toml](./templates/config/macos.toml)
-  - [windows.toml](./templates/config/windows.toml)
+- Global: [default.toml](./templates/config/default.toml)
+- OS-specific:
+  - [linux.toml](./templates/config/os/linux.toml)
+  - [macos.toml](./templates/config/os/macos.toml)
+  - [windows.toml](./templates/config/os/windows.toml)
 
-## FAQ
+## Development
 
-### How to compile on Windows?
+### Windows Compilation
 
-`icli` depends on the `pnet` crate.
-On Windows systems,`pent` crate has some compilation requirements,
-please refer to the [libpnet](https://github.com/libpnet/libpnet?tab=readme-ov-file#windows).
+This project depends on the `pnet` crate. For Windows compilation requirements, please refer to [libpnet documentation](https://github.com/libpnet/libpnet?tab=readme-ov-file#windows).
 
 ## Changelog
 
@@ -89,4 +95,4 @@ See [CHANGELOG.md](./CHANGELOG.md).
 
 ## License
 
-`icli` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+`icli` is licensed under the [MIT License](https://spdx.org/licenses/MIT.html).
