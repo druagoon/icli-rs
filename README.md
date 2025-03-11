@@ -5,7 +5,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/druagoon/icli-rs)](https://github.com/druagoon/icli-rs/releases)
 [![GitHub issues](https://img.shields.io/github/issues/druagoon/icli-rs)](https://github.com/druagoon/icli-rs/issues)
 
-A personal command-line tool that includes various commonly used utilities.
+A personal command-line tool includes various commonly used utilities.
 
 -----
 
