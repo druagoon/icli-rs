@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-03-11
+
+### Added
+
+- *(ci)* Add Homebrew formula update step to release workflow ([699abb9](https://github.com/druagoon/icli-rs/commit/699abb986c9db39761d8f69dcc8f42b4d99e6faf))
+- *(utils)* Add tilde expansion utility and update related functions ([c89bb18](https://github.com/druagoon/icli-rs/commit/c89bb18247b59dd263916095b900850d3d3ca556))
+- *(config)* Add MITM section to QuantumultX configuration ([a6fa90e](https://github.com/druagoon/icli-rs/commit/a6fa90e360002f152cb01741b9febb38e5029962))
+
 ## [1.2.0] - 2024-08-31
 
 ### Added
@@ -30,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
+[1.3.0]: https://github.com/druagoon/icli-rs/compare/v1.2.0..v1.3.0
 [1.2.0]: https://github.com/druagoon/icli-rs/compare/v1.1.0..v1.2.0
 [1.1.0]: https://github.com/druagoon/icli-rs/compare/v1.0.0..v1.1.0
 [1.0.0]: https://github.com/druagoon/icli-rs/releases/tag/v1.0.0
