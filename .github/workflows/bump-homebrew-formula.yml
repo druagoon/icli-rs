@@ -1,8 +1,9 @@
 name: Bump Homebrew formula
 
 on:
+  workflow_dispatch:
   release:
-    types: [released]
+    types: [published]
 
 jobs:
   bump-homebrew-formula:
