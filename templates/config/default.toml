@@ -23,3 +23,7 @@
 # url = ""
 # img_url = ""
 # interval = 86400
+
+[quantumultx.mitm]
+# passphrase = ""
+# p12 = ""
