@@ -24,7 +24,6 @@ A personal command-line tool includes various commonly used utilities.
 - [Changelog](#changelog)
 - [License](#license)
 
-
 ## Installation
 
 ### From Homebrew
